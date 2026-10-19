@@ -1,0 +1,1937 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Uganda CPI Intelligence Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+      :root {
+        --bg: #f4f7f4;
+        --surface: #ffffff;
+        --border: #e1e8e2;
+        --text-primary: #17221d;
+        --text-secondary: #65736b;
+        --accent: #12624d;
+        --accent-light: #e8f3ee;
+        --gold: #946709;
+        --gold-light: #fbf3dd;
+        --green: #1e6b3a;
+        --green-light: #e8f4ea;
+        --red: #b3261e;
+        --red-light: #fbeae8;
+        --ink: #14231d;
+        --ink-soft: #afc0b7;
+        --ochre: #e4b63f;
+        --radius: 12px;
+        --shadow: 0 8px 24px rgba(20, 35, 29, 0.045);
+        --font: "Public Sans", system-ui, -apple-system, sans-serif;
+        --serif: "Newsreader", Georgia, serif;
+        --mono: ui-monospace, "SF Mono", Menlo, monospace;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--text-primary);
+        font-size: 14px;
+        line-height: 1.6;
+        font-variant-numeric: tabular-nums;
+      }
+      h1 {
+        font-family: var(--serif);
+        font-size: 1.4rem;
+        font-weight: 600;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+      }
+      h2 {
+        font-family: var(--serif);
+        font-size: 1.35rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      h3 {
+        font-size: 0.98rem;
+        font-weight: 600;
+      }
+      p {
+        color: var(--text-secondary);
+        max-width: 68ch;
+      }
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 260px minmax(0, 1fr);
+        min-height: 100vh;
+      }
+      .sidebar {
+        background: var(--ink);
+        color: #fff;
+        padding: 30px 20px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        z-index: 5;
+      }
+      .sidebar-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .sidebar h1 {
+        color: #fff;
+      }
+      .menu-toggle {
+        display: none;
+      }
+      .header-badge {
+        display: inline-block;
+        margin-top: 9px;
+        color: var(--ochre);
+        font-size: 0.76rem;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+      }
+      .nav-tabs {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .nav-tab {
+        text-align: left;
+        padding: 11px 13px;
+        border: 1px solid transparent;
+        background: none;
+        cursor: pointer;
+        font: inherit;
+        font-size: 0.88rem;
+        font-weight: 500;
+        color: var(--ink-soft);
+        border-radius: 9px;
+        transition:
+          color 0.15s,
+          background 0.15s,
+          border-color 0.15s;
+      }
+      .nav-tab:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .nav-tab.active {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.08);
+      }
+      .nav-tab:focus-visible {
+        outline-color: var(--ochre);
+      }
+      .api-status {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 0.78rem;
+        color: var(--ink-soft);
+      }
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #74847b;
+        flex: none;
+      }
+      .status-dot.ok {
+        background: #4ade80;
+      }
+      .status-dot.err {
+        background: #f87171;
+      }
+
+      .main {
+        padding: clamp(24px, 4vw, 54px);
+        max-width: 1600px;
+        width: 100%;
+        margin: 0 auto;
+        min-width: 0;
+      }
+      .section {
+        display: none;
+        min-width: 0;
+      }
+      .section.active {
+        display: block;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+        gap: 36px;
+        align-items: center;
+        padding: 28px;
+        margin-bottom: 20px;
+        background: linear-gradient(135deg, #ffffff 55%, #f0f7f2);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+      }
+      .hero-label {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+      }
+      .hero-figure {
+        font-family: var(--serif);
+        font-size: clamp(3.2rem, 6vw, 5rem);
+        font-weight: 500;
+        line-height: 1;
+        letter-spacing: -0.04em;
+        margin: 8px 0 12px;
+      }
+      .hero-note {
+        font-size: 0.9rem;
+      }
+      .hero-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .hero-stats .card-value {
+        font-family: var(--serif);
+        font-size: 1.55rem;
+        font-weight: 600;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px 20px;
+        box-shadow: var(--shadow);
+      }
+      .card-title {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 5px;
+      }
+      .card-value {
+        font-family: var(--serif);
+        font-size: 1.9rem;
+        font-weight: 600;
+        letter-spacing: -0.03em;
+        line-height: 1.2;
+      }
+      .card-sub {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin-top: 4px;
+        line-height: 1.45;
+      }
+      .hero-stats .card {
+        background: #f7f9f7;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 13px 12px;
+        box-shadow: none;
+        min-width: 0;
+      }
+
+      .grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 20px;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 20px;
+      }
+      .grid-2 > *,
+      .grid-3 > * {
+        min-width: 0;
+      }
+
+      .chart-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 22px 24px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow);
+        min-width: 0;
+      }
+      .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+      .chart-title {
+        font-family: var(--serif);
+        font-size: 1.12rem;
+        font-weight: 600;
+        line-height: 1.3;
+        letter-spacing: -0.01em;
+      }
+      .chart-sub {
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        margin-top: 4px;
+      }
+      .chart-wrap {
+        position: relative;
+        height: 260px;
+        min-width: 0;
+      }
+      .chart-wrap-lg {
+        position: relative;
+        height: 340px;
+        min-width: 0;
+      }
+
+      .table-scroll {
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.82rem;
+      }
+      .data-table th {
+        padding: 10px 12px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.73rem;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      .data-table th.text-right {
+        text-align: right;
+      }
+      .data-table td {
+        padding: 11px 12px;
+        border-bottom: 1px solid #edf1ed;
+        white-space: nowrap;
+      }
+      .data-table tr:last-child td {
+        border-bottom: none;
+      }
+      .data-table tbody tr:hover td {
+        background: #f7f9f7;
+      }
+
+      .verdict {
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-top: 16px;
+        font-size: 0.84rem;
+        line-height: 1.55;
+      }
+      .verdict.significant {
+        background: var(--red-light);
+        border-left: 3px solid var(--red);
+      }
+      .verdict.insignificant {
+        background: var(--green-light);
+        border-left: 3px solid var(--green);
+      }
+      .verdict.info {
+        background: var(--accent-light);
+        border-left: 3px solid var(--accent);
+      }
+
+      .calc-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 12px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      .calc-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+      }
+      .calc-label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+      }
+      .calc-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #d3ddd5;
+        border-radius: 9px;
+        font-size: 0.9rem;
+        font: inherit;
+        outline: none;
+        background: var(--surface);
+        min-height: 44px;
+      }
+      .calc-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-light);
+      }
+      .calc-btn {
+        padding: 10px 22px;
+        min-height: 44px;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 9px;
+        font: inherit;
+        font-size: 0.88rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+        white-space: nowrap;
+      }
+      .calc-btn:hover {
+        background: #0b4637;
+      }
+      .field-error {
+        display: none;
+        color: var(--red);
+        font-size: 0.84rem;
+        margin-bottom: 12px;
+      }
+      .field-error.show {
+        display: block;
+      }
+
+      .burden-result {
+        background: var(--accent-light);
+        border: 1px solid #cbe1d6;
+        border-radius: 12px;
+        padding: 18px 22px;
+        margin-top: 8px;
+        display: none;
+      }
+      .burden-big {
+        font-family: var(--serif);
+        font-size: 2.4rem;
+        font-weight: 600;
+        color: var(--accent);
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+      }
+      .burden-label {
+        font-size: 0.84rem;
+        color: var(--text-secondary);
+        margin-top: 2px;
+      }
+
+      .metric-row {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      .metric-pill {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 16px;
+        flex: 1;
+        min-width: 120px;
+      }
+      .metric-label {
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+      }
+      .metric-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-top: 2px;
+      }
+      .metric-value.good {
+        color: var(--green);
+      }
+
+      .skeleton {
+        background: linear-gradient(
+          90deg,
+          #edf1ed 25%,
+          #e0e7e0 50%,
+          #edf1ed 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.4s infinite;
+        border-radius: 5px;
+        height: 16px;
+        margin-bottom: 8px;
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+      .error-box {
+        background: var(--red-light);
+        border: 1px solid #f3c4bf;
+        border-radius: 10px;
+        padding: 14px 16px;
+        color: var(--red);
+        font-size: 0.86rem;
+      }
+
+      .text-right {
+        text-align: right;
+      }
+      .text-orange {
+        color: #a95a0a;
+      }
+      .text-green {
+        color: var(--green);
+      }
+      .text-red {
+        color: var(--red);
+      }
+      .text-muted {
+        color: var(--text-secondary);
+      }
+      .mt-4 {
+        margin-top: 16px;
+      }
+      .mb-4 {
+        margin-bottom: 16px;
+      }
+
+      @media (max-width: 1120px) {
+        .shell {
+          grid-template-columns: 224px minmax(0, 1fr);
+        }
+        .main {
+          padding: 30px 26px;
+        }
+        .hero {
+          grid-template-columns: 1fr;
+          gap: 24px;
+        }
+      }
+      @media (max-width: 900px) {
+        .shell {
+          display: block;
+        }
+        .sidebar {
+          position: sticky;
+          top: 0;
+          height: auto;
+          flex-direction: row;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px 16px;
+          padding: 12px 20px 0;
+        }
+        .sidebar-head {
+          order: 1;
+          width: 100%;
+        }
+        .sidebar .header-badge {
+          display: none;
+        }
+        .menu-toggle {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 9px;
+          min-width: 88px;
+          min-height: 44px;
+          padding: 8px 12px;
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          border-radius: 9px;
+          background: rgba(255, 255, 255, 0.06);
+          color: #fff;
+          font: inherit;
+          font-size: 0.84rem;
+          font-weight: 600;
+          cursor: pointer;
+        }
+        .menu-icon {
+          display: grid;
+          gap: 4px;
+        }
+        .menu-icon span {
+          display: block;
+          width: 17px;
+          height: 2px;
+          border-radius: 2px;
+          background: currentColor;
+          transition:
+            transform 0.15s,
+            opacity 0.15s;
+        }
+        .menu-toggle[aria-expanded="true"] .menu-icon span:first-child {
+          transform: translateY(6px) rotate(45deg);
+        }
+        .menu-toggle[aria-expanded="true"] .menu-icon span:nth-child(2) {
+          opacity: 0;
+        }
+        .menu-toggle[aria-expanded="true"] .menu-icon span:last-child {
+          transform: translateY(-6px) rotate(-45deg);
+        }
+        .api-status {
+          margin: 0;
+          order: 2;
+          white-space: nowrap;
+        }
+        .nav-tabs {
+          order: 3;
+          flex-direction: column;
+          flex-wrap: nowrap;
+          width: 100%;
+          gap: 4px;
+          padding: 0 0 12px;
+          margin: 0;
+        }
+        .nav-tabs:not(.open) {
+          display: none;
+        }
+        .nav-tab {
+          flex: 0 0 auto;
+          text-align: left;
+          border-radius: 9px;
+          padding: 10px 13px;
+          min-height: 44px;
+          background: rgba(255, 255, 255, 0.06);
+          white-space: normal;
+        }
+        .nav-tab.active {
+          background: var(--ochre);
+          color: var(--ink);
+        }
+        .main {
+          padding: 24px 20px 40px;
+        }
+      }
+      @media (max-width: 700px) {
+        .grid-4 {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+        }
+        .grid-2,
+        .grid-3 {
+          grid-template-columns: 1fr;
+          gap: 14px;
+        }
+        .hero {
+          padding: 22px;
+          gap: 20px;
+        }
+        .hero-stats {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+        }
+        .hero-stats .card-value {
+          font-size: 1.4rem;
+        }
+        .chart-card {
+          padding: 18px 16px;
+          margin-bottom: 16px;
+        }
+        .grid-2 {
+          margin-bottom: 16px;
+        }
+        .calc-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          align-items: stretch;
+          gap: 12px;
+        }
+        .calc-row .calc-field:first-child {
+          grid-column: 1/-1;
+        }
+        .calc-row .calc-btn {
+          grid-column: 1/-1;
+          width: 100%;
+        }
+        .chart-wrap {
+          height: 240px;
+        }
+        .chart-wrap-lg {
+          height: 300px;
+        }
+        .forecast-table {
+          min-width: 760px;
+        }
+      }
+      @media (max-width: 420px) {
+        .sidebar {
+          padding: 11px 14px 0;
+        }
+        .sidebar h1 {
+          font-size: 1.15rem;
+        }
+        .nav-tab {
+          font-size: 0.82rem;
+          padding: 8px 11px;
+        }
+        .main {
+          padding: 18px 12px 32px;
+        }
+        .hero {
+          padding: 18px 16px;
+        }
+        .hero-figure {
+          font-size: 3.35rem;
+        }
+        .hero-stats .card {
+          padding: 11px 10px;
+        }
+        .hero-stats .card-value {
+          font-size: 1.28rem;
+        }
+        .hero-stats .card-sub {
+          font-size: 0.69rem;
+        }
+        .chart-card {
+          padding: 16px 13px;
+          border-radius: 12px;
+        }
+        .chart-title {
+          font-size: 1.02rem;
+        }
+        .chart-wrap {
+          height: 220px;
+        }
+        .chart-wrap-lg {
+          height: 270px;
+        }
+        .burden-big {
+          font-size: 2rem;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="sidebar-head">
+          <div>
+            <h1>Uganda CPI Intelligence</h1>
+            <span class="header-badge" id="datasetBadge">Loading…</span>
+          </div>
+          <button
+            class="menu-toggle"
+            type="button"
+            aria-label="Open navigation menu"
+            aria-expanded="false"
+            aria-controls="dashboardNavigation"
+            onclick="toggleNavigation()"
+          >
+            <span class="menu-icon" aria-hidden="true"
+              ><span></span><span></span><span></span
+            ></span>
+            <span>Menu</span>
+          </button>
+        </div>
+        <nav
+          class="nav-tabs"
+          id="dashboardNavigation"
+          aria-label="Dashboard sections"
+        >
+          <button
+            class="nav-tab active"
+            type="button"
+            aria-current="page"
+            onclick="showSection('overview', this)"
+          >
+            Overview
+          </button>
+          <button
+            class="nav-tab"
+            type="button"
+            onclick="showSection('drivers', this)"
+          >
+            Inflation Drivers
+          </button>
+          <button
+            class="nav-tab"
+            type="button"
+            onclick="showSection('calculator', this)"
+          >
+            Household Calculator
+          </button>
+          <button
+            class="nav-tab"
+            type="button"
+            onclick="showSection('essential', this)"
+          >
+            Essential vs Discretionary
+          </button>
+          <button
+            class="nav-tab"
+            type="button"
+            onclick="showSection('forecast', this)"
+          >
+            3-Month Forecast
+          </button>
+        </nav>
+        <div class="api-status" role="status">
+          <div class="status-dot" id="statusDot"></div>
+          <span id="statusLabel">Connecting…</span>
+        </div>
+      </aside>
+
+      <main class="main">
+        <!-- SECTION 1: OVERVIEW -->
+        <section class="section active" id="sec-overview">
+          <div class="hero" id="kpiRow">
+            <div>
+              <div class="hero-label">
+                Annual inflation · <span id="kpi-annual-sub">Year-on-year</span>
+              </div>
+              <div class="hero-figure" id="kpi-annual">—</div>
+              <p class="hero-note" id="hero-note">
+                Loading the latest reading…
+              </p>
+            </div>
+            <div class="hero-stats">
+              <div class="card">
+                <div class="card-title">Latest CPI</div>
+                <div class="card-value" id="kpi-cpi">—</div>
+                <div class="card-sub" id="kpi-cpi-sub">
+                  Latest month (base 2016/17=100)
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-title">Cumulative growth</div>
+                <div class="card-value" id="kpi-growth">—</div>
+                <div class="card-sub" id="kpi-growth-sub">—</div>
+              </div>
+              <div class="card">
+                <div class="card-title">Peak annual rate</div>
+                <div class="card-value" id="kpi-peak">—</div>
+                <div class="card-sub" id="kpi-peak-date">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">
+                  Headline CPI — Monthly Index & Annual Inflation Rate
+                </div>
+                <div class="chart-sub">
+                  <span id="chart-sub-obs">All Items, 2016/17=100</span>
+                </div>
+              </div>
+            </div>
+            <div class="chart-wrap-lg">
+              <canvas id="chartHeadline"></canvas>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="chart-card" style="margin-bottom: 0">
+              <div class="chart-header">
+                <div>
+                  <div class="chart-title">Month-on-Month Change</div>
+                  <div class="chart-sub">Headline CPI volatility</div>
+                </div>
+              </div>
+              <div class="chart-wrap"><canvas id="chartMonthly"></canvas></div>
+            </div>
+            <div class="chart-card" style="margin-bottom: 0">
+              <div class="chart-header">
+                <div>
+                  <div class="chart-title">Anomalous Inflation Months</div>
+                  <div class="chart-sub">
+                    Z-score &gt; 2.0 standard deviations from mean
+                  </div>
+                </div>
+              </div>
+              <div class="chart-wrap">
+                <canvas id="chartAnomalies"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 2: DRIVERS -->
+        <section class="section" id="sec-drivers">
+          <div class="grid-2">
+            <div class="chart-card" style="margin-bottom: 0">
+              <div class="chart-header">
+                <div>
+                  <div class="chart-title">
+                    Weighted Contribution to Headline Inflation
+                  </div>
+                  <div class="chart-sub" id="drivers-period-sub">
+                    Latest period · percentage points
+                  </div>
+                </div>
+              </div>
+              <div style="overflow-x: auto">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Category</th>
+                      <th class="text-right">Ann. Rate %</th>
+                      <th class="text-right">Weight</th>
+                      <th class="text-right">Contribution pp</th>
+                    </tr>
+                  </thead>
+                  <tbody id="driversBody">
+                    <tr>
+                      <td colspan="4"><div class="skeleton"></div></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="chart-card" style="margin-bottom: 0">
+              <div class="chart-header">
+                <div>
+                  <div class="chart-title">Contribution Ranking</div>
+                  <div class="chart-sub">
+                    Percentage points to headline annual rate
+                  </div>
+                </div>
+              </div>
+              <div class="chart-wrap-lg">
+                <canvas id="chartContrib"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="chart-card mt-4">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Cumulative CPI Growth by Category</div>
+                <div class="chart-sub" id="chart-sub-growth">
+                  % growth since the first month
+                </div>
+              </div>
+            </div>
+            <div class="chart-wrap-lg"><canvas id="chartGrowth"></canvas></div>
+          </div>
+        </section>
+
+        <!-- SECTION 3: HOUSEHOLD CALCULATOR -->
+        <section class="section" id="sec-calculator">
+          <div class="chart-card">
+            <h2 class="mb-4">Household Cost Burden Calculator</h2>
+            <p class="mb-4">
+              Enter your monthly basket and choose any two months within the
+              dataset to compare how much more that basket costs.
+            </p>
+
+            <div class="calc-row">
+              <div class="calc-field" style="flex: 2; min-width: 180px">
+                <label class="calc-label" for="basketInput"
+                  >Monthly basket (UGX)</label
+                >
+                <input
+                  class="calc-input"
+                  type="number"
+                  id="basketInput"
+                  placeholder="e.g. 500000"
+                  min="1000"
+                  step="10000"
+                  value="500000"
+                />
+              </div>
+              <div class="calc-field" style="flex: 1; min-width: 150px">
+                <label class="calc-label" for="baseSelect"
+                  >From (base period)</label
+                >
+                <select
+                  class="calc-input"
+                  id="baseSelect"
+                  style="cursor: pointer"
+                ></select>
+              </div>
+              <div class="calc-field" style="flex: 1; min-width: 150px">
+                <label class="calc-label" for="targetSelect"
+                  >To (comparison period)</label
+                >
+                <select
+                  class="calc-input"
+                  id="targetSelect"
+                  style="cursor: pointer"
+                ></select>
+              </div>
+              <button
+                class="calc-btn"
+                type="button"
+                onclick="calculateBurden()"
+              >
+                Calculate
+              </button>
+            </div>
+
+            <div class="field-error" id="calcError" role="alert"></div>
+            <div class="burden-result" id="burdenResult" aria-live="polite">
+              <div class="burden-label" id="burdenPeriodLabel">—</div>
+              <div class="burden-big" id="burdenExtra">—</div>
+              <div class="burden-label" id="burdenGrowth">—</div>
+            </div>
+          </div>
+
+          <div class="grid-2" id="burdenCharts" style="display: none">
+            <div class="chart-card" style="margin-bottom: 0">
+              <div class="chart-title">Burden by Category</div>
+              <div class="chart-sub mb-4">
+                Extra UGX per category based on your basket
+              </div>
+              <div class="chart-wrap-lg">
+                <canvas id="chartBurden"></canvas>
+              </div>
+            </div>
+            <div class="chart-card" style="margin-bottom: 0">
+              <div class="chart-title">Top 5 Cost Drivers</div>
+              <div class="chart-sub mb-4">
+                Categories adding the most to your basket cost
+              </div>
+              <div style="overflow-x: auto">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Category</th>
+                      <th class="text-right">Extra UGX</th>
+                      <th class="text-right">Growth %</th>
+                    </tr>
+                  </thead>
+                  <tbody id="burdenBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 4: ESSENTIAL VS DISCRETIONARY -->
+        <section class="section" id="sec-essential">
+          <div class="grid-3">
+            <div class="card">
+              <div class="card-title">Essential Mean Inflation</div>
+              <div class="card-value" id="evd-ess">—</div>
+              <div class="card-sub" id="evd-ess-sub">
+                Food, Clothing, Housing, Health, Transport, Education
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Discretionary Mean Inflation</div>
+              <div class="card-value" id="evd-disc">—</div>
+              <div class="card-sub" id="evd-disc-sub">All other categories</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Welch t-test p-value</div>
+              <div class="card-value" id="evd-p">—</div>
+              <div class="card-sub" id="evd-sig">—</div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">
+                  Essential vs Discretionary — Monthly Mean Annual Inflation
+                </div>
+                <div class="chart-sub">
+                  Average annual % change across each group of categories
+                </div>
+              </div>
+            </div>
+            <div class="chart-wrap-lg"><canvas id="chartEvd"></canvas></div>
+            <div class="verdict" id="evdVerdict"></div>
+          </div>
+        </section>
+
+        <!-- SECTION 5: FORECAST -->
+        <section class="section" id="sec-forecast">
+          <!-- Forecast chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title" id="forecastTitle">CPI Forecast</div>
+                <div class="chart-sub" id="forecastSub">
+                  90% prediction interval · last 24 months shown
+                </div>
+              </div>
+            </div>
+            <div class="chart-wrap-lg">
+              <canvas id="chartForecast"></canvas>
+            </div>
+            <p
+              class="mb-4"
+              id="forecastReliabilityNote"
+              style="
+                font-size: 0.85rem;
+                color: var(--muted, #6b7280);
+                margin-top: 12px;
+              "
+            >
+              <strong>How reliable is this?</strong> The 1-month forecast is the
+              most dependable. Accuracy falls as the forecast looks further
+              ahead, so treat the 2- and 3-month values as indicative and use
+              the shaded 90% range, which widens with each month, rather than
+              the single line.
+            </p>
+          </div>
+
+          <!-- Forecast values table -->
+          <div class="chart-card">
+            <h3 class="mb-4">Forecast Values</h3>
+            <div
+              class="table-scroll"
+              role="region"
+              aria-label="Forecast values table"
+              tabindex="0"
+            >
+              <table class="data-table forecast-table">
+                <thead>
+                  <tr>
+                    <th>Month</th>
+                    <th class="text-right" id="thModel">ML Point</th>
+                    <th class="text-right">Lower (90%)</th>
+                    <th class="text-right">Upper (90%)</th>
+                    <th class="text-right">Annual %</th>
+                    <th class="text-right">Annual % Lower</th>
+                    <th class="text-right">Annual % Upper</th>
+                  </tr>
+                </thead>
+                <tbody id="forecastBody">
+                  <tr>
+                    <td colspan="7"><div class="skeleton"></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div
+              class="verdict info mt-4"
+              style="font-size: 0.82rem"
+              id="modelNote"
+            >
+              <strong>Model note:</strong> loading…
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const localApiPort =
+        new URLSearchParams(location.search).get("apiPort") || "5000";
+      const API_BASE = ["localhost", "127.0.0.1"].includes(location.hostname)
+        ? `http://localhost:${localApiPort}/api/v1`
+        : "https://ugandacpi.up.railway.app/api/v1";
+
+      Chart.defaults.font.family = "'Public Sans',system-ui,sans-serif";
+      Chart.defaults.font.size = 11;
+      Chart.defaults.color = "#5D6B64";
+      Chart.defaults.plugins.legend.labels.boxWidth = 12;
+      Chart.defaults.plugins.legend.labels.padding = 16;
+      Chart.defaults.plugins.tooltip.padding = 10;
+      Chart.defaults.plugins.tooltip.backgroundColor = "#14201C";
+      Chart.defaults.plugins.tooltip.titleColor = "#F1F3EF";
+      Chart.defaults.plugins.tooltip.bodyColor = "#C9D4CD";
+      Chart.defaults.plugins.tooltip.callbacks.label = (ctx) => {
+        const v =
+          ctx.chart.options.indexAxis === "y" ? ctx.parsed.x : ctx.parsed.y;
+        const num =
+          v == null
+            ? "—"
+            : Number(v).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              });
+        return `${ctx.dataset.label ? ctx.dataset.label + ": " : ""}${num}`;
+      };
+
+      let charts = {};
+
+      // Navigation
+      function toggleNavigation() {
+        const menu = document.getElementById("dashboardNavigation");
+        const toggle = document.querySelector(".menu-toggle");
+        const isOpen = menu.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", String(isOpen));
+        toggle.setAttribute(
+          "aria-label",
+          isOpen ? "Close navigation menu" : "Open navigation menu",
+        );
+      }
+
+      function showSection(id, btn) {
+        document
+          .querySelectorAll(".section")
+          .forEach((s) => s.classList.remove("active"));
+        document.querySelectorAll(".nav-tab").forEach((b) => {
+          b.classList.remove("active");
+          b.removeAttribute("aria-current");
+        });
+        document.getElementById("sec-" + id).classList.add("active");
+        btn.classList.add("active");
+        btn.setAttribute("aria-current", "page");
+        const menu = document.getElementById("dashboardNavigation");
+        const toggle = document.querySelector(".menu-toggle");
+        menu.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
+        toggle.setAttribute("aria-label", "Open navigation menu");
+        window.scrollTo(0, 0);
+      }
+
+      // Formatters
+      const fmt = (n) => (n == null ? "—" : Number(n).toFixed(2));
+      const fmtPct = (n) => (n == null ? "—" : Number(n).toFixed(2) + "%");
+      const fmtUGX = (n) =>
+        n == null
+          ? "—"
+          : "UGX " +
+            Number(n).toLocaleString("en-UG", { maximumFractionDigits: 0 });
+      const shortDate = (d) =>
+        new Date(d).toLocaleDateString("en-GB", {
+          month: "short",
+          year: "2-digit",
+        });
+      const fullDate = (d) =>
+        new Date(`${d}T00:00:00Z`).toLocaleDateString("en-GB", {
+          month: "long",
+          year: "numeric",
+          timeZone: "UTC",
+        });
+
+      function destroyChart(id) {
+        if (charts[id]) {
+          charts[id].destroy();
+          delete charts[id];
+        }
+      }
+
+      async function apiFetch(endpoint) {
+        const res = await fetch(API_BASE + endpoint);
+        if (!res.ok) throw new Error(`HTTP ${res.status} on ${endpoint}`);
+        return res.json();
+      }
+
+      // API status check
+      async function checkStatus() {
+        const dot = document.getElementById("statusDot");
+        const lbl = document.getElementById("statusLabel");
+        try {
+          await apiFetch("/");
+          dot.className = "status-dot ok";
+          lbl.textContent = "API connected";
+        } catch {
+          dot.className = "status-dot err";
+          lbl.textContent = "API offline — start the Flask server";
+        }
+      }
+
+      // SECTION 1: OVERVIEW
+      async function loadOverview() {
+        try {
+          const [summary, headline, anomalyData] = await Promise.all([
+            apiFetch("/summary"),
+            apiFetch("/headline"),
+            apiFetch("/anomalies"),
+          ]);
+
+          const latestAnnual = Object.values(headline.annual_pct)
+            .filter((v) => v != null)
+            .at(-1);
+          document.getElementById("kpi-cpi").textContent = fmt(
+            summary.latest_cpi,
+          );
+          document.getElementById("kpi-annual").textContent =
+            fmtPct(latestAnnual);
+          document.getElementById("kpi-growth").textContent = fmtPct(
+            summary.cumulative_growth_pct,
+          );
+          document.getElementById("kpi-peak").textContent = fmtPct(
+            summary.max_annual_rate.rate,
+          );
+          document.getElementById("kpi-peak-date").textContent =
+            summary.max_annual_rate.date;
+          document.getElementById("datasetBadge").textContent =
+            `${summary.first_period} – ${summary.latest_period}`;
+          document.getElementById("kpi-cpi-sub").textContent =
+            `${summary.latest_period} (base 2016/17=100)`;
+          document.getElementById("kpi-annual-sub").textContent =
+            `Year-on-year, ${summary.latest_period}`;
+          document.getElementById("kpi-growth-sub").textContent =
+            `${summary.first_period} → ${summary.latest_period}`;
+
+          document.getElementById("chart-sub-obs").textContent =
+            `All Items, 2016/17=100 · ${Object.keys(headline.cpi).length} monthly observations`;
+          document.getElementById("chart-sub-growth").textContent =
+            `% growth since ${summary.first_period}`;
+          const annEl = document.getElementById("kpi-annual");
+          annEl.style.color =
+            latestAnnual > 5
+              ? "var(--red)"
+              : latestAnnual > 3
+                ? "var(--gold)"
+                : "var(--green)";
+          const annSeries = Object.entries(headline.annual_pct).filter(
+            ([, v]) => v != null,
+          );
+          if (annSeries.length > 1) {
+            const diff = latestAnnual - annSeries.at(-2)[1];
+            const band =
+              latestAnnual > 5
+                ? "above"
+                : latestAnnual > 3
+                  ? "within"
+                  : "below";
+            document.getElementById("hero-note").textContent =
+              `${diff >= 0 ? "Up" : "Down"} ${Math.abs(diff).toFixed(2)} points from ${shortDate(annSeries.at(-2)[0])}. Prices are rising ${band === "within" ? "at a moderate pace" : band === "above" ? "faster than the 5% mark" : "slower than the 3% mark"}.`;
+          }
+
+          const dates = Object.keys(headline.cpi);
+          const cpiVals = Object.values(headline.cpi);
+          const annVals = Object.values(headline.annual_pct);
+
+          destroyChart("headline");
+          charts.headline = new Chart(
+            document.getElementById("chartHeadline"),
+            {
+              data: {
+                labels: dates.map(shortDate),
+                datasets: [
+                  {
+                    type: "line",
+                    label: "CPI Index",
+                    data: cpiVals,
+                    borderColor: "#0F5C4A",
+                    backgroundColor: "rgba(15,92,74,0.08)",
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 0,
+                    borderWidth: 2,
+                    yAxisID: "y",
+                  },
+                  {
+                    type: "line",
+                    label: "Annual Inflation %",
+                    data: annVals,
+                    borderColor: "#C28A12",
+                    backgroundColor: "transparent",
+                    tension: 0.3,
+                    pointRadius: 0,
+                    borderWidth: 1.5,
+                    borderDash: [4, 3],
+                    yAxisID: "y1",
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: "index", intersect: false },
+                plugins: { legend: { position: "top" } },
+                scales: {
+                  x: { grid: { display: false }, ticks: { maxTicksLimit: 12 } },
+                  y: {
+                    position: "left",
+                    title: { display: true, text: "CPI Index" },
+                    grid: { color: "#E6EAE5" },
+                  },
+                  y1: {
+                    position: "right",
+                    title: { display: true, text: "Annual %" },
+                    grid: { display: false },
+                  },
+                },
+              },
+            },
+          );
+
+          const monthVals = Object.values(headline.monthly_pct);
+          destroyChart("monthly");
+          charts.monthly = new Chart(document.getElementById("chartMonthly"), {
+            type: "bar",
+            data: {
+              labels: dates.map(shortDate),
+              datasets: [
+                {
+                  label: "Month-on-Month %",
+                  data: monthVals,
+                  backgroundColor: monthVals.map((v) =>
+                    v == null
+                      ? "transparent"
+                      : v >= 0
+                        ? "rgba(15,92,74,0.6)"
+                        : "rgba(179,38,30,0.6)",
+                  ),
+                  borderWidth: 0,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { grid: { display: false }, ticks: { maxTicksLimit: 12 } },
+                y: {
+                  grid: { color: "#E6EAE5" },
+                  ticks: { callback: (v) => v + "%" },
+                },
+              },
+            },
+          });
+
+          const anomalies = anomalyData.anomalies || [];
+          destroyChart("anomalies");
+          charts.anomalies = new Chart(
+            document.getElementById("chartAnomalies"),
+            {
+              type: "bar",
+              data: {
+                labels: anomalies.map((a) => a.month_label),
+                datasets: [
+                  {
+                    label: "Annual Inflation %",
+                    data: anomalies.map((a) => a.annual_rate),
+                    backgroundColor: anomalies.map((a) =>
+                      a.direction === "high"
+                        ? "rgba(179,38,30,0.8)"
+                        : "rgba(15,92,74,0.8)",
+                    ),
+                    borderWidth: 0,
+                    borderRadius: 4,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { display: false },
+                  tooltip: {
+                    callbacks: {
+                      label: (ctx) =>
+                        `${ctx.raw.toFixed(2)}% (${anomalies[ctx.dataIndex]?.direction})`,
+                    },
+                  },
+                },
+                scales: {
+                  x: { grid: { display: false } },
+                  y: {
+                    grid: { color: "#E6EAE5" },
+                    ticks: { callback: (v) => v + "%" },
+                  },
+                },
+              },
+            },
+          );
+        } catch (err) {
+          console.error("Overview error:", err);
+          document.getElementById("kpiRow").innerHTML =
+            `<div class="error-box" style="grid-column:1/-1">Could not load data. Make sure the Flask API server is running on port 5000.</div>`;
+        }
+      }
+
+      // SECTION 2: DRIVERS
+      async function loadDrivers() {
+        try {
+          const [driversData, growthData] = await Promise.all([
+            apiFetch("/drivers"),
+            apiFetch("/growth"),
+          ]);
+
+          const drivers = driversData.drivers.filter(
+            (d) => d.category !== "All Items",
+          );
+          const maxContrib = Math.max(
+            ...drivers.map((d) => Math.abs(d.contribution)),
+          );
+          document.getElementById("drivers-period-sub").textContent =
+            `Year to ${fullDate(driversData.period)} · percentage points`;
+
+          document.getElementById("driversBody").innerHTML = drivers
+            .map((d) => {
+              const bw = Math.round(
+                (Math.abs(d.contribution) / maxContrib) * 60,
+              );
+              const cls = d.contribution > 0 ? "text-red" : "text-green";
+              return `<tr>
+        <td>${d.category}</td>
+        <td class="text-right ${cls}">${fmtPct(d.annual_rate)}</td>
+        <td class="text-right text-muted">${fmt(d.weight)}</td>
+        <td class="text-right ${cls}" style="position:relative;padding-left:${bw + 8}px">
+          <div style="position:absolute;left:6px;top:50%;transform:translateY(-50%);height:4px;width:${bw}px;background:currentColor;border-radius:2px;opacity:0.3"></div>
+          ${fmt(d.contribution)}
+        </td>
+      </tr>`;
+            })
+            .join("");
+
+          destroyChart("contrib");
+          charts.contrib = new Chart(document.getElementById("chartContrib"), {
+            type: "bar",
+            data: {
+              labels: drivers.map((d) =>
+                d.category.length > 28
+                  ? d.category.slice(0, 28) + "…"
+                  : d.category,
+              ),
+              datasets: [
+                {
+                  label: "Contribution (pp)",
+                  data: drivers.map((d) => d.contribution),
+                  backgroundColor: drivers.map((d) =>
+                    d.contribution > 0
+                      ? "rgba(179,38,30,0.7)"
+                      : "rgba(232,113,10,0.7)",
+                  ),
+                  borderWidth: 0,
+                  borderRadius: 3,
+                },
+              ],
+            },
+            options: {
+              indexAxis: "y",
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: {
+                  grid: { color: "#E6EAE5" },
+                  ticks: { callback: (v) => v + " pp" },
+                },
+                y: { grid: { display: false }, ticks: { font: { size: 10 } } },
+              },
+            },
+          });
+
+          const growth = growthData.growth;
+          const gDates = Object.keys(Object.values(growth)[0]);
+          const PALETTE = [
+            "#0F5C4A",
+            "#C28A12",
+            "#15803D",
+            "#3D5A80",
+            "#B3261E",
+            "#7A4E9C",
+          ];
+          const topCats = [
+            "All Items",
+            ...drivers.slice(0, 5).map((d) => d.category),
+          ];
+
+          destroyChart("growth");
+          charts.growth = new Chart(document.getElementById("chartGrowth"), {
+            type: "line",
+            data: {
+              labels: gDates.map(shortDate),
+              datasets: topCats.map((cat, i) => ({
+                label: cat === "All Items" ? "Headline" : cat.slice(0, 30),
+                data: Object.values(growth[cat] || {}),
+                borderColor: PALETTE[i % PALETTE.length],
+                backgroundColor: "transparent",
+                tension: 0.3,
+                pointRadius: 0,
+                borderWidth: cat === "All Items" ? 2.5 : 1.5,
+              })),
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: { mode: "index", intersect: false },
+              plugins: { legend: { position: "top" } },
+              scales: {
+                x: { grid: { display: false }, ticks: { maxTicksLimit: 12 } },
+                y: {
+                  grid: { color: "#E6EAE5" },
+                  ticks: { callback: (v) => v + "%" },
+                },
+              },
+            },
+          });
+        } catch (err) {
+          console.error("Drivers error:", err);
+          document.getElementById("driversBody").innerHTML =
+            `<tr><td colspan="4"><div class="error-box">Could not load drivers data.</div></td></tr>`;
+        }
+      }
+
+      // SECTION 3: CALCULATOR — populate date selects
+      async function populateDateSelects() {
+        try {
+          const data = await apiFetch("/headline");
+          const dates = Object.keys(data.cpi);
+
+          const baseEl = document.getElementById("baseSelect");
+          const targetEl = document.getElementById("targetSelect");
+
+          dates.forEach((d) => {
+            const label = new Date(d).toLocaleDateString("en-GB", {
+              month: "short",
+              year: "numeric",
+            });
+            baseEl.insertAdjacentHTML(
+              "beforeend",
+              `<option value="${d}">${label}</option>`,
+            );
+            targetEl.insertAdjacentHTML(
+              "beforeend",
+              `<option value="${d}">${label}</option>`,
+            );
+          });
+
+          // Default: base = first month in the data, target = latest month
+          baseEl.selectedIndex = 0;
+          targetEl.selectedIndex = dates.length - 1;
+        } catch (err) {
+          console.error("Could not populate date selects:", err);
+        }
+      }
+
+      async function calculateBurden() {
+        const basket = parseFloat(document.getElementById("basketInput").value);
+        const errEl = document.getElementById("calcError");
+        errEl.classList.remove("show");
+        if (!basket || basket <= 0) {
+          errEl.textContent = "Enter a basket amount greater than zero.";
+          errEl.classList.add("show");
+          return;
+        }
+
+        const base = document.getElementById("baseSelect").value;
+        const target = document.getElementById("targetSelect").value;
+
+        if (base >= target) {
+          errEl.textContent =
+            "Choose a 'From' month that is earlier than the 'To' month.";
+          errEl.classList.add("show");
+          return;
+        }
+
+        try {
+          const data = await apiFetch(
+            `/burden?basket=${basket}&base=${base}&target=${target}`,
+          );
+
+          document.getElementById("burdenResult").style.display = "block";
+          document.getElementById("burdenPeriodLabel").textContent =
+            `Additional monthly cost: ${data.base_period} → ${data.target_period}`;
+          document.getElementById("burdenExtra").textContent = fmtUGX(
+            data.headline_burden.extra_ugx,
+          );
+          document.getElementById("burdenGrowth").textContent =
+            `${fmtPct(data.headline_burden.growth_pct)} total price increase over the selected period`;
+
+          document.getElementById("burdenCharts").style.display = "grid";
+
+          const cats = data.category_burdens.slice(0, 8);
+          const labels = cats.map((c) =>
+            c.category.length > 25 ? c.category.slice(0, 25) + "…" : c.category,
+          );
+
+          destroyChart("burden");
+          charts.burden = new Chart(document.getElementById("chartBurden"), {
+            type: "bar",
+            data: {
+              labels,
+              datasets: [
+                {
+                  label: "Extra UGX",
+                  data: cats.map((c) => c.extra_ugx),
+                  backgroundColor: "rgba(15,92,74,0.65)",
+                  borderWidth: 0,
+                  borderRadius: 4,
+                },
+              ],
+            },
+            options: {
+              indexAxis: "y",
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: {
+                  grid: { color: "#E6EAE5" },
+                  ticks: { callback: (v) => "UGX " + v.toLocaleString() },
+                },
+                y: { grid: { display: false }, ticks: { font: { size: 10 } } },
+              },
+            },
+          });
+
+          document.getElementById("burdenBody").innerHTML =
+            data.category_burdens
+              .slice(0, 5)
+              .map(
+                (c) => `
+      <tr>
+        <td>${c.category}</td>
+        <td class="text-right text-red">${fmtUGX(c.extra_ugx)}</td>
+        <td class="text-right text-muted">${fmtPct(c.growth_pct)}</td>
+      </tr>`,
+              )
+              .join("");
+        } catch (err) {
+          console.error("Burden error:", err);
+          const el = document.getElementById("burdenResult");
+          el.style.display = "block";
+          el.innerHTML = `<div class="error-box">Could not calculate burden: ${err.message}</div>`;
+        }
+      }
+
+      // SECTION 4: ESSENTIAL VS DISCRETIONARY
+      async function loadEssential() {
+        try {
+          const data = await apiFetch("/essential-vs-discretionary");
+
+          document.getElementById("evd-ess").textContent = fmtPct(
+            data.essential_mean,
+          );
+          document.getElementById("evd-disc").textContent = fmtPct(
+            data.discretionary_mean,
+          );
+          if (data.n_discretionary != null)
+            document.getElementById("evd-disc-sub").textContent =
+              `All other ${data.n_discretionary} categories`;
+          if (data.essential_categories)
+            document.getElementById("evd-ess-sub").textContent =
+              `${data.n_essential} categories: Food, Clothing, Housing, Health, Transport, Education`;
+          document.getElementById("evd-p").textContent =
+            data.p_value.toFixed(4);
+
+          const pEl = document.getElementById("evd-p");
+          const sigEl = document.getElementById("evd-sig");
+          pEl.style.color = data.significant ? "var(--red)" : "var(--green)";
+          sigEl.textContent = data.significant
+            ? "Statistically significant (p < 0.05)"
+            : "Not significant (p ≥ 0.05)";
+
+          const ts = data.timeseries;
+          const labels = ts.dates.map(shortDate);
+
+          destroyChart("evd");
+          charts.evd = new Chart(document.getElementById("chartEvd"), {
+            type: "line",
+            data: {
+              labels,
+              datasets: [
+                {
+                  label: "Essential categories",
+                  data: ts.essential_mean,
+                  borderColor: "#B3261E",
+                  backgroundColor: "rgba(179,38,30,0.06)",
+                  fill: true,
+                  tension: 0.3,
+                  pointRadius: 0,
+                  borderWidth: 2,
+                },
+                {
+                  label: "Discretionary categories",
+                  data: ts.discretionary_mean,
+                  borderColor: "#0F5C4A",
+                  backgroundColor: "rgba(15,92,74,0.06)",
+                  fill: true,
+                  tension: 0.3,
+                  pointRadius: 0,
+                  borderWidth: 2,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: { mode: "index", intersect: false },
+              plugins: { legend: { position: "top" } },
+              scales: {
+                x: { grid: { display: false }, ticks: { maxTicksLimit: 12 } },
+                y: {
+                  grid: { color: "#E6EAE5" },
+                  ticks: { callback: (v) => v + "%" },
+                },
+              },
+            },
+          });
+
+          const verdictEl = document.getElementById("evdVerdict");
+          verdictEl.className =
+            "verdict " + (data.significant ? "significant" : "insignificant");
+          verdictEl.innerHTML = `<strong>Welch t-test result (p = ${data.p_value.toFixed(4)}):</strong> ${data.interpretation}`;
+        } catch (err) {
+          console.error("Essential vs Discretionary error:", err);
+        }
+      }
+
+      // SECTION 5: FORECAST — selected (best) machine-learning model only
+      async function loadForecast() {
+        try {
+          const [fc, val, headlineData] = await Promise.all([
+            apiFetch("/forecast"),
+            apiFetch("/forecast/validation"),
+            apiFetch("/headline"),
+          ]);
+
+          const model = fc.model;
+          const allDates = Object.keys(headlineData.cpi);
+          const allCPI = Object.values(headlineData.cpi);
+          const last24D = allDates.slice(-24);
+          const last24CPI = allCPI.slice(-24);
+          const nF = fc.forecast_dates.length;
+
+          document.getElementById("forecastTitle").textContent =
+            `CPI Forecast — ${fc.forecast_labels.join(" · ")}`;
+          document.getElementById("forecastSub").textContent =
+            `${model} · 90% prediction interval · last 24 months shown`;
+
+          const labels = [...last24D, ...fc.forecast_dates].map(shortDate);
+          const actualData = [...last24CPI, ...Array(nF).fill(null)];
+          const pointData = [
+            ...Array(23).fill(null),
+            last24CPI.at(-1),
+            ...fc.point,
+          ];
+          const upperData = [...Array(24).fill(null), ...fc.upper];
+          const lowerData = [...Array(24).fill(null), ...fc.lower];
+
+          destroyChart("forecast");
+          charts.forecast = new Chart(
+            document.getElementById("chartForecast"),
+            {
+              type: "line",
+              data: {
+                labels,
+                datasets: [
+                  {
+                    label: "Actual CPI",
+                    data: actualData,
+                    borderColor: "#0F5C4A",
+                    backgroundColor: "transparent",
+                    tension: 0.2,
+                    pointRadius: 0,
+                    borderWidth: 2.5,
+                  },
+                  {
+                    label: "Forecast",
+                    data: pointData,
+                    borderColor: "#E8710A",
+                    backgroundColor: "transparent",
+                    tension: 0.2,
+                    pointRadius: 4,
+                    pointBackgroundColor: "#E8710A",
+                    borderWidth: 2,
+                  },
+                  {
+                    label: "Upper (90%)",
+                    data: upperData,
+                    borderColor: "rgba(232,113,10,0.25)",
+                    backgroundColor: "transparent",
+                    tension: 0.2,
+                    pointRadius: 0,
+                    borderWidth: 1,
+                    borderDash: [2, 4],
+                  },
+                  {
+                    label: "Lower (90%)",
+                    data: lowerData,
+                    borderColor: "rgba(232,113,10,0.25)",
+                    backgroundColor: "rgba(232,113,10,0.08)",
+                    tension: 0.2,
+                    pointRadius: 0,
+                    borderWidth: 1,
+                    borderDash: [2, 4],
+                    fill: "-1",
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: "index", intersect: false },
+                plugins: { legend: { position: "top" } },
+                scales: {
+                  x: { grid: { display: false } },
+                  y: {
+                    grid: { color: "#E6EAE5" },
+                    ticks: { callback: (v) => v?.toFixed(1) },
+                  },
+                },
+                spanGaps: true,
+              },
+            },
+          );
+
+          const cell = (v) => (v != null ? fmt(v) : "—");
+          const pct = (v) => (v != null ? fmtPct(v) : "—");
+          document.getElementById("thModel").textContent = "Forecast CPI";
+          document.getElementById("forecastBody").innerHTML = fc.forecast_labels
+            .map(
+              (lbl, i) => `
+        <tr>
+          <td><strong>${lbl}</strong></td>
+          <td class="text-right text-orange"><strong>${cell(fc.point[i])}</strong></td>
+          <td class="text-right text-muted">${cell(fc.lower[i])}</td>
+          <td class="text-right text-muted">${cell(fc.upper[i])}</td>
+          <td class="text-right text-orange"><strong>${pct(fc.annual_pct_point?.[i])}</strong></td>
+          <td class="text-right text-muted">${pct(fc.annual_pct_lower?.[i])}</td>
+          <td class="text-right text-muted">${pct(fc.annual_pct_upper?.[i])}</td>
+        </tr>`,
+            )
+            .join("");
+
+          document.getElementById("modelNote").innerHTML =
+            `<strong>Model note:</strong> forecasts come from ${model}, the best-performing model ` +
+            `from the project's model-selection experiment. It predicts CPI growth over 1, 2 and 3 months ` +
+            `from recent monthly changes, rolling averages and the calendar month. ` +
+            `Walk-forward validation over ${val.n_validation_steps} forecast origins gave a MAPE of ` +
+            `${val.mape.toFixed(2)}%. Intervals come from the model's own past forecast errors.`;
+        } catch (err) {
+          console.error("Forecast error:", err);
+          document.getElementById("forecastBody").innerHTML =
+            `<tr><td colspan="7"><div class="error-box">Could not load forecast: ${err.message}</div></td></tr>`;
+        }
+      }
+      // Initialise
+      (async function init() {
+        await checkStatus();
+        await populateDateSelects();
+        await Promise.all([
+          loadOverview(),
+          loadDrivers(),
+          loadEssential(),
+          loadForecast(),
+        ]);
+      })();
+    </script>
+  </body>
+</html>
