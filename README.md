@@ -95,8 +95,8 @@ These instructions are for contributors; dashboard visitors should use the hoste
 ### Run locally
 
 ```bash
-git clone https://github.com/chiefainamani/ugandacpi.git
-cd ugandacpi
+git clone https://github.com/chiefainamani/cpiuganda.git
+cd cpiuganda
 uv sync
 uv run python -m api.app
 ```
