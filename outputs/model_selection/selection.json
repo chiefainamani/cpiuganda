@@ -1,0 +1,548 @@
+{
+  "selected_model": "SVR",
+  "selection_rule": "Lowest average rank across overall MAPE, overall RMSE and worst-period MAPE among the four ML candidates.",
+  "evaluation": {
+    "protocol": "Walk-forward (expanding window), direct multi-step",
+    "first_training_months": 48,
+    "n_origins": 61,
+    "horizons": [
+      1,
+      2,
+      3
+    ],
+    "tuning": "TimeSeriesSplit, re-tuned every 12 origins"
+  },
+  "overall_metrics": [
+    {
+      "model": "GradientBoosting",
+      "MAPE_%": 0.5497,
+      "RMSE": 1.0241,
+      "MAE": 0.6998,
+      "Bias": -0.2205,
+      "n": 183.0
+    },
+    {
+      "model": "Lasso",
+      "MAPE_%": 0.5738,
+      "RMSE": 1.1196,
+      "MAE": 0.7254,
+      "Bias": -0.1473,
+      "n": 183.0
+    },
+    {
+      "model": "Naive-drift",
+      "MAPE_%": 0.5897,
+      "RMSE": 1.0678,
+      "MAE": 0.7503,
+      "Bias": -0.0494,
+      "n": 183.0
+    },
+    {
+      "model": "OLS-trend",
+      "MAPE_%": 2.0125,
+      "RMSE": 3.2597,
+      "MAE": 2.5816,
+      "Bias": -2.5676,
+      "n": 183.0
+    },
+    {
+      "model": "RandomForest",
+      "MAPE_%": 0.5718,
+      "RMSE": 1.0604,
+      "MAE": 0.7267,
+      "Bias": -0.3261,
+      "n": 183.0
+    },
+    {
+      "model": "SARIMA",
+      "MAPE_%": 0.5832,
+      "RMSE": 1.0652,
+      "MAE": 0.7394,
+      "Bias": -0.306,
+      "n": 183.0
+    },
+    {
+      "model": "SVR",
+      "MAPE_%": 0.5371,
+      "RMSE": 1.0189,
+      "MAE": 0.679,
+      "Bias": -0.2089,
+      "n": 183.0
+    }
+  ],
+  "metrics_by_horizon": [
+    {
+      "model": "GradientBoosting",
+      "h": 1,
+      "MAPE_%": 0.2919,
+      "RMSE": 0.464,
+      "MAE": 0.3694,
+      "Bias": -0.1263,
+      "n": 61.0
+    },
+    {
+      "model": "GradientBoosting",
+      "h": 2,
+      "MAPE_%": 0.5698,
+      "RMSE": 0.978,
+      "MAE": 0.7243,
+      "Bias": -0.2056,
+      "n": 61.0
+    },
+    {
+      "model": "GradientBoosting",
+      "h": 3,
+      "MAPE_%": 0.7873,
+      "RMSE": 1.4053,
+      "MAE": 1.0058,
+      "Bias": -0.3295,
+      "n": 61.0
+    },
+    {
+      "model": "Lasso",
+      "h": 1,
+      "MAPE_%": 0.3239,
+      "RMSE": 0.5249,
+      "MAE": 0.409,
+      "Bias": -0.0869,
+      "n": 61.0
+    },
+    {
+      "model": "Lasso",
+      "h": 2,
+      "MAPE_%": 0.5584,
+      "RMSE": 0.9749,
+      "MAE": 0.7057,
+      "Bias": -0.1453,
+      "n": 61.0
+    },
+    {
+      "model": "Lasso",
+      "h": 3,
+      "MAPE_%": 0.8392,
+      "RMSE": 1.5921,
+      "MAE": 1.0614,
+      "Bias": -0.2098,
+      "n": 61.0
+    },
+    {
+      "model": "Naive-drift",
+      "h": 1,
+      "MAPE_%": 0.3395,
+      "RMSE": 0.5485,
+      "MAE": 0.4307,
+      "Bias": -0.019,
+      "n": 61.0
+    },
+    {
+      "model": "Naive-drift",
+      "h": 2,
+      "MAPE_%": 0.5971,
+      "RMSE": 1.0131,
+      "MAE": 0.7588,
+      "Bias": -0.0431,
+      "n": 61.0
+    },
+    {
+      "model": "Naive-drift",
+      "h": 3,
+      "MAPE_%": 0.8325,
+      "RMSE": 1.4468,
+      "MAE": 1.0615,
+      "Bias": -0.0862,
+      "n": 61.0
+    },
+    {
+      "model": "OLS-trend",
+      "h": 1,
+      "MAPE_%": 1.889,
+      "RMSE": 3.0679,
+      "MAE": 2.4197,
+      "Bias": -2.3999,
+      "n": 61.0
+    },
+    {
+      "model": "OLS-trend",
+      "h": 2,
+      "MAPE_%": 2.0097,
+      "RMSE": 3.2533,
+      "MAE": 2.5772,
+      "Bias": -2.5606,
+      "n": 61.0
+    },
+    {
+      "model": "OLS-trend",
+      "h": 3,
+      "MAPE_%": 2.1386,
+      "RMSE": 3.4471,
+      "MAE": 2.748,
+      "Bias": -2.7423,
+      "n": 61.0
+    },
+    {
+      "model": "RandomForest",
+      "h": 1,
+      "MAPE_%": 0.3229,
+      "RMSE": 0.5126,
+      "MAE": 0.408,
+      "Bias": -0.1725,
+      "n": 61.0
+    },
+    {
+      "model": "RandomForest",
+      "h": 2,
+      "MAPE_%": 0.5641,
+      "RMSE": 0.9652,
+      "MAE": 0.7169,
+      "Bias": -0.2736,
+      "n": 61.0
+    },
+    {
+      "model": "RandomForest",
+      "h": 3,
+      "MAPE_%": 0.8284,
+      "RMSE": 1.476,
+      "MAE": 1.0554,
+      "Bias": -0.5322,
+      "n": 61.0
+    },
+    {
+      "model": "SARIMA",
+      "h": 1,
+      "MAPE_%": 0.3209,
+      "RMSE": 0.5345,
+      "MAE": 0.4047,
+      "Bias": -0.1636,
+      "n": 61.0
+    },
+    {
+      "model": "SARIMA",
+      "h": 2,
+      "MAPE_%": 0.5996,
+      "RMSE": 1.0152,
+      "MAE": 0.7609,
+      "Bias": -0.3036,
+      "n": 61.0
+    },
+    {
+      "model": "SARIMA",
+      "h": 3,
+      "MAPE_%": 0.829,
+      "RMSE": 1.4449,
+      "MAE": 1.0527,
+      "Bias": -0.4509,
+      "n": 61.0
+    },
+    {
+      "model": "SVR",
+      "h": 1,
+      "MAPE_%": 0.286,
+      "RMSE": 0.4659,
+      "MAE": 0.3607,
+      "Bias": -0.0762,
+      "n": 61.0
+    },
+    {
+      "model": "SVR",
+      "h": 2,
+      "MAPE_%": 0.5589,
+      "RMSE": 0.949,
+      "MAE": 0.7076,
+      "Bias": -0.2065,
+      "n": 61.0
+    },
+    {
+      "model": "SVR",
+      "h": 3,
+      "MAPE_%": 0.7665,
+      "RMSE": 1.4131,
+      "MAE": 0.9688,
+      "Bias": -0.3441,
+      "n": 61.0
+    }
+  ],
+  "metrics_by_period": [
+    {
+      "period": "Pre-shock (to Dec 2021)",
+      "model": "GradientBoosting",
+      "MAPE_%": 0.3294,
+      "RMSE": 0.4905,
+      "MAE": 0.3777,
+      "Bias": -0.1539,
+      "n": 21.0
+    },
+    {
+      "period": "Pre-shock (to Dec 2021)",
+      "model": "Lasso",
+      "MAPE_%": 0.347,
+      "RMSE": 0.503,
+      "MAE": 0.3978,
+      "Bias": -0.1565,
+      "n": 21.0
+    },
+    {
+      "period": "Pre-shock (to Dec 2021)",
+      "model": "Naive-drift",
+      "MAPE_%": 0.2814,
+      "RMSE": 0.3927,
+      "MAE": 0.3221,
+      "Bias": -0.1276,
+      "n": 21.0
+    },
+    {
+      "period": "Pre-shock (to Dec 2021)",
+      "model": "OLS-trend",
+      "MAPE_%": 0.2663,
+      "RMSE": 0.4353,
+      "MAE": 0.3059,
+      "Bias": -0.1835,
+      "n": 21.0
+    },
+    {
+      "period": "Pre-shock (to Dec 2021)",
+      "model": "RandomForest",
+      "MAPE_%": 0.3334,
+      "RMSE": 0.4877,
+      "MAE": 0.3822,
+      "Bias": -0.141,
+      "n": 21.0
+    },
+    {
+      "period": "Pre-shock (to Dec 2021)",
+      "model": "SARIMA",
+      "MAPE_%": 0.4047,
+      "RMSE": 0.6204,
+      "MAE": 0.4643,
+      "Bias": -0.4035,
+      "n": 21.0
+    },
+    {
+      "period": "Pre-shock (to Dec 2021)",
+      "model": "SVR",
+      "MAPE_%": 0.3655,
+      "RMSE": 0.5581,
+      "MAE": 0.4194,
+      "Bias": -0.2042,
+      "n": 21.0
+    },
+    {
+      "period": "Shock (Jan 2022 - Jun 2023)",
+      "model": "GradientBoosting",
+      "MAPE_%": 1.0352,
+      "RMSE": 1.6519,
+      "MAE": 1.2779,
+      "Bias": -0.1343,
+      "n": 54.0
+    },
+    {
+      "period": "Shock (Jan 2022 - Jun 2023)",
+      "model": "Lasso",
+      "MAPE_%": 1.2031,
+      "RMSE": 1.9027,
+      "MAE": 1.4842,
+      "Bias": -0.402,
+      "n": 54.0
+    },
+    {
+      "period": "Shock (Jan 2022 - Jun 2023)",
+      "model": "Naive-drift",
+      "MAPE_%": 1.2306,
+      "RMSE": 1.7869,
+      "MAE": 1.5259,
+      "Bias": 0.1252,
+      "n": 54.0
+    },
+    {
+      "period": "Shock (Jan 2022 - Jun 2023)",
+      "model": "OLS-trend",
+      "MAPE_%": 3.9517,
+      "RMSE": 5.2519,
+      "MAE": 4.9335,
+      "Bias": -4.9335,
+      "n": 54.0
+    },
+    {
+      "period": "Shock (Jan 2022 - Jun 2023)",
+      "model": "RandomForest",
+      "MAPE_%": 1.096,
+      "RMSE": 1.7185,
+      "MAE": 1.3499,
+      "Bias": -0.414,
+      "n": 54.0
+    },
+    {
+      "period": "Shock (Jan 2022 - Jun 2023)",
+      "model": "SARIMA",
+      "MAPE_%": 1.1182,
+      "RMSE": 1.7362,
+      "MAE": 1.3786,
+      "Bias": -0.6669,
+      "n": 54.0
+    },
+    {
+      "period": "Shock (Jan 2022 - Jun 2023)",
+      "model": "SVR",
+      "MAPE_%": 1.1213,
+      "RMSE": 1.693,
+      "MAE": 1.3843,
+      "Bias": -0.3132,
+      "n": 54.0
+    },
+    {
+      "period": "Normalisation (Jul 2023 on)",
+      "model": "GradientBoosting",
+      "MAPE_%": 0.3498,
+      "RMSE": 0.605,
+      "MAE": 0.4734,
+      "Bias": -0.2765,
+      "n": 108.0
+    },
+    {
+      "period": "Normalisation (Jul 2023 on)",
+      "model": "Lasso",
+      "MAPE_%": 0.3033,
+      "RMSE": 0.5145,
+      "MAE": 0.4096,
+      "Bias": -0.0182,
+      "n": 108.0
+    },
+    {
+      "period": "Normalisation (Jul 2023 on)",
+      "model": "Naive-drift",
+      "MAPE_%": 0.3292,
+      "RMSE": 0.5526,
+      "MAE": 0.4458,
+      "Bias": -0.1216,
+      "n": 108.0
+    },
+    {
+      "period": "Normalisation (Jul 2023 on)",
+      "model": "OLS-trend",
+      "MAPE_%": 1.3824,
+      "RMSE": 2.0437,
+      "MAE": 1.8482,
+      "Bias": -1.8482,
+      "n": 108.0
+    },
+    {
+      "period": "Normalisation (Jul 2023 on)",
+      "model": "RandomForest",
+      "MAPE_%": 0.3561,
+      "RMSE": 0.6183,
+      "MAE": 0.4822,
+      "Bias": -0.3181,
+      "n": 108.0
+    },
+    {
+      "period": "Normalisation (Jul 2023 on)",
+      "model": "SARIMA",
+      "MAPE_%": 0.3504,
+      "RMSE": 0.5835,
+      "MAE": 0.4734,
+      "Bias": -0.1066,
+      "n": 108.0
+    },
+    {
+      "period": "Normalisation (Jul 2023 on)",
+      "model": "SVR",
+      "MAPE_%": 0.2784,
+      "RMSE": 0.5152,
+      "MAE": 0.3769,
+      "Bias": -0.1577,
+      "n": 108.0
+    }
+  ],
+  "baselines": [
+    "Naive-drift",
+    "OLS-trend",
+    "SARIMA"
+  ],
+  "ranking": [
+    {
+      "model": "SVR",
+      "MAPE_%": 0.5371,
+      "RMSE": 1.0189,
+      "Worst_period_MAPE_%": 1.1213,
+      "rank_MAPE_%": 1.0,
+      "rank_RMSE": 1.0,
+      "rank_Worst_period_MAPE_%": 3.0,
+      "avg_rank": 1.6667,
+      "overall_rank": 1
+    },
+    {
+      "model": "GradientBoosting",
+      "MAPE_%": 0.5497,
+      "RMSE": 1.0241,
+      "Worst_period_MAPE_%": 1.0352,
+      "rank_MAPE_%": 2.0,
+      "rank_RMSE": 2.0,
+      "rank_Worst_period_MAPE_%": 1.0,
+      "avg_rank": 1.6667,
+      "overall_rank": 2
+    },
+    {
+      "model": "RandomForest",
+      "MAPE_%": 0.5718,
+      "RMSE": 1.0604,
+      "Worst_period_MAPE_%": 1.096,
+      "rank_MAPE_%": 3.0,
+      "rank_RMSE": 3.0,
+      "rank_Worst_period_MAPE_%": 2.0,
+      "avg_rank": 2.6667,
+      "overall_rank": 3
+    },
+    {
+      "model": "Lasso",
+      "MAPE_%": 0.5738,
+      "RMSE": 1.1196,
+      "Worst_period_MAPE_%": 1.2031,
+      "rank_MAPE_%": 4.0,
+      "rank_RMSE": 4.0,
+      "rank_Worst_period_MAPE_%": 4.0,
+      "avg_rank": 4.0,
+      "overall_rank": 4
+    }
+  ],
+  "best_baseline": "SARIMA",
+  "beats_best_baseline": true,
+  "params_by_horizon": {
+    "1": {
+      "C": 1.0,
+      "epsilon": 0.1
+    },
+    "2": {
+      "C": 1.0,
+      "epsilon": 0.1
+    },
+    "3": {
+      "C": 1.0,
+      "epsilon": 0.1
+    }
+  },
+  "error_quantiles_90": {
+    "1": {
+      "lower": -0.5787871752082223,
+      "upper": 0.7197529228484418
+    },
+    "2": {
+      "lower": -1.2331783753473344,
+      "upper": 1.4431772295423573
+    },
+    "3": {
+      "lower": -1.276312464593667,
+      "upper": 2.6136411555385575
+    }
+  },
+  "calibration_coverage_holdout": {
+    "1": 1.0,
+    "2": 1.0,
+    "3": 1.0
+  },
+  "feature_importance_selected": {},
+  "figures": [
+    "fig_mape_by_horizon.png",
+    "fig_actual_vs_forecast_h3.png",
+    "fig_mape_by_period.png"
+  ],
+  "data_end": "2026-09-01"
+}

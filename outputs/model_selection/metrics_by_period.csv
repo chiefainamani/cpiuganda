@@ -1,0 +1,22 @@
+period,model,MAPE_%,RMSE,MAE,Bias,n
+Pre-shock (to Dec 2021),GradientBoosting,0.3294,0.4905,0.3777,-0.1539,21.0
+Pre-shock (to Dec 2021),Lasso,0.347,0.503,0.3978,-0.1565,21.0
+Pre-shock (to Dec 2021),Naive-drift,0.2814,0.3927,0.3221,-0.1276,21.0
+Pre-shock (to Dec 2021),OLS-trend,0.2663,0.4353,0.3059,-0.1835,21.0
+Pre-shock (to Dec 2021),RandomForest,0.3334,0.4877,0.3822,-0.141,21.0
+Pre-shock (to Dec 2021),SARIMA,0.4047,0.6204,0.4643,-0.4035,21.0
+Pre-shock (to Dec 2021),SVR,0.3655,0.5581,0.4194,-0.2042,21.0
+Shock (Jan 2022 - Jun 2023),GradientBoosting,1.0352,1.6519,1.2779,-0.1343,54.0
+Shock (Jan 2022 - Jun 2023),Lasso,1.2031,1.9027,1.4842,-0.402,54.0
+Shock (Jan 2022 - Jun 2023),Naive-drift,1.2306,1.7869,1.5259,0.1252,54.0
+Shock (Jan 2022 - Jun 2023),OLS-trend,3.9517,5.2519,4.9335,-4.9335,54.0
+Shock (Jan 2022 - Jun 2023),RandomForest,1.096,1.7185,1.3499,-0.414,54.0
+Shock (Jan 2022 - Jun 2023),SARIMA,1.1182,1.7362,1.3786,-0.6669,54.0
+Shock (Jan 2022 - Jun 2023),SVR,1.1213,1.693,1.3843,-0.3132,54.0
+Normalisation (Jul 2023 on),GradientBoosting,0.3498,0.605,0.4734,-0.2765,108.0
+Normalisation (Jul 2023 on),Lasso,0.3033,0.5145,0.4096,-0.0182,108.0
+Normalisation (Jul 2023 on),Naive-drift,0.3292,0.5526,0.4458,-0.1216,108.0
+Normalisation (Jul 2023 on),OLS-trend,1.3824,2.0437,1.8482,-1.8482,108.0
+Normalisation (Jul 2023 on),RandomForest,0.3561,0.6183,0.4822,-0.3181,108.0
+Normalisation (Jul 2023 on),SARIMA,0.3504,0.5835,0.4734,-0.1066,108.0
+Normalisation (Jul 2023 on),SVR,0.2784,0.5152,0.3769,-0.1577,108.0
