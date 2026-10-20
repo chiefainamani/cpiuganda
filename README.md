@@ -32,7 +32,7 @@ The dashboard requests current values from the API rather than embedding monthly
 The public dashboard and API are deployed separately:
 
 - **Dashboard:** [chiefainamani.github.io/ugandacpi](https://chiefainamani.github.io/ugandacpi/)
-- **API base URL:** [ugandacpi.up.railway.app/api/v1](https://cpiuganda.up.railway.app/api/v1)
+- **API base URL:** [ugandacpi.up.railway.app/api/v1](https://uganda-cpi-proxy.ainamanidickso.workers.dev/api/v1)
 
 ## Project structure
 
