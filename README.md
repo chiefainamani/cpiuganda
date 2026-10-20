@@ -8,7 +8,7 @@ An interactive system for exploring Uganda's Consumer Price Index (CPI) using mo
 
 Use the hosted dashboard; no installation or local server is needed:
 
-**[Open the Uganda CPI Intelligence dashboard](https://chiefainamani.github.io/ugandacpi/)**
+**[Open the Uganda CPI Intelligence dashboard](https://chiefainamani.github.io/cpiuganda/)**
 
 The dashboard is hosted on GitHub Pages and retrieves its data from a separately hosted API. The API root reports the coverage of the data currently deployed, so the dashboard always reflects the latest release that has been processed and published to the API.
 
@@ -32,7 +32,7 @@ The dashboard requests current values from the API rather than embedding monthly
 The public dashboard and API are deployed separately:
 
 - **Dashboard:** [chiefainamani.github.io/ugandacpi](https://chiefainamani.github.io/ugandacpi/)
-- **API base URL:** [ugandacpi.up.railway.app/api/v1](https://ugandacpi.up.railway.app/api/v1)
+- **API base URL:** [ugandacpi.up.railway.app/api/v1](https://cpiuganda.up.railway.app/api/v1)
 
 ## Project structure
 
